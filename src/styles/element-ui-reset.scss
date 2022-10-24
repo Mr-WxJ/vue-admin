@@ -1,0 +1,32 @@
+/* 鼠标滑过高亮显示 */
+.el-table tbody tr:hover > td {
+  background-color: rgb(189, 189, 189) !important;
+}
+
+// /* 改变主题色变量 */
+// $--color-primary: teal;
+
+// /* 改变 icon 字体路径变量，必需 */
+// $--font-path: "~element-ui/lib/theme-chalk/fonts";
+
+// @import "~element-ui/packages/theme-chalk/src/index";
+
+//修改分页颜色
+.el-pagination {
+  position: absolute;
+  display: inline-block;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+$--color-primary: #425897 !default;
+$--color-success: #51c88a !default;
+$--color-warning: #f5ac83 !default;
+$--color-danger: #f04b69 !default;
+$--color-info: #a9a9b2 !default;
+
+/* 改变 icon 字体路径变量，必需 */
+$--font-path: "~element-ui/lib/theme-chalk/fonts";
+
+@import "~element-ui/packages/theme-chalk/src/index";

@@ -1,366 +1,143 @@
 <template>
-  <div class="app-container">
-    <div class="filter-container">
-      <el-input v-model="listQuery.title" placeholder="标题" style="width: 200px" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.importance" placeholder="重要性" clearable style="width: 90px" class="filter-item">
-        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+  <el-tabs type="border-card">
+    <el-tab-pane label="播放数据详情">
+      <el-select v-model="time" placeholder="请选择时间" style="width:200px;margin: 20px">
+        <el-option v-for="item in timeType" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-select v-model="listQuery.type" placeholder="类型" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name + '(' + item.key + ')'" :value="item.key" />
+      <el-select v-model="program" placeholder="请选择节目类型" style="width:200px;margin: 20px">
+        <el-option v-for="item in programType" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
+      <el-select v-model="topRank" placeholder="请选择Top" style="width:200px;margin: 20px">
+        <el-option v-for="item in TopSelect" :key="item" :label="item" :value="item" />
       </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
-      <el-button class="filter-item" style="margin-left: 10px" type="primary" icon="el-icon-edit" @click="handleCreate">
-        添加</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
-      <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left: 15px" @change="tableKey = tableKey + 1">审核人</el-checkbox>
-    </div>
-
-    <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%" @sort-change="sortChange">
-      <el-table-column label="序号" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
-        <template slot-scope="{ row }">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="时间" width="150px" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="标题" min-width="150px">
-        <template slot-scope="{ row }">
-          <span class="link-type" @click="handleUpdate(row)">
-            {{ row.title }}
-          </span>
-          <el-tag>{{ row.type | typeFilter }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="作者" width="110px" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
-        <template slot-scope="{ row }">
-          <span style="color: red">{{ row.reviewer }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="重要性" width="80px">
-        <template slot-scope="{ row }">
-          <svg-icon v-for="n in +row.importance" :key="n" icon-class="star" class="meta-item__icon" />
-        </template>
-      </el-table-column>
-      <el-table-column label="阅读数" align="center" width="95">
-        <template slot-scope="{ row }">
-          <span v-if="row.pageviews" class="link-type" @click="handleFetchPv(row.pageviews)">{{ row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" class-name="status-col" width="100">
-        <template slot-scope="{ row }">
-          <el-tag :type="row.status | statusFilter">{{ row.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
-        <template slot-scope="{ row, $index }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">编辑</el-button>
-          <el-button v-if="row.status != 'published'" size="mini" type="success" @click="handleModifyStatus(row, 'published')">发布</el-button>
-          <el-button v-if="row.status != 'draft'" size="mini" @click="handleModifyStatus(row, 'draft')">草稿</el-button>
-          <el-button v-if="row.status != 'deleted'" size="mini" type="danger" @click="handleDelete(row, $index)">删除
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left: 50px">
-        <el-form-item label="类型" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="时间" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
-        </el-form-item>
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="temp.title" />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="重要性">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top: 8px" />
-        </el-form-item>
-        <el-form-item label="点评">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="Please input" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogStatus === 'create' ? createData() : updateData()">Confirm</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
+      <el-table :data="tableData" style="width: 100%" :cell-style="{ textAlign: 'center' }">
+        <el-table-column type="index" align="center" :resizable="false" label="排名" width="100">
+          <template slot-scope="scope" style="position: relative; width: 160px; height: 80px;">
+            <span v-if="scope.$index+1 == 1">{{ topRank }}</span>
+            <span v-else-if="scope.$index+1 == 2">
+              <svg-icon icon-class="排行榜" style="width: 60px; height: 60px" />
+              <span style="position: relative;left: -37px;bottom: 25px;color: brown;size: 60px;font-weight: bolder">1</span>
+            </span>
+            <span v-else-if="scope.$index+1 == 3">
+              <svg-icon icon-class="排行榜" style="width: 60px; height: 60px" />
+              <span style="position: relative;left: -37px;bottom: 25px;color: brown;size: 60px;font-weight: bolder">2</span>
+            </span>
+            <span v-else-if="scope.$index+1 == 4">
+              <svg-icon icon-class="排行榜" style="width: 60px; height: 60px" />
+              <span style="position: relative;left: -37px;bottom: 25px;color: brown;size: 60px;font-weight: bolder">3</span>
+            </span>
+            <span v-else>
+              <svg-icon icon-class="排行榜grey" style="width: 55px; height: 53px" />
+              <span style="position: relative;left: -35px;bottom: 27px;color: brown;size: 60px;font-weight: bolder">{{ scope.$index }}</span>
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column v-for="(item,key) in columnDate" :key="item" width="180" :prop="item" :label="item" align="left">
+          <template slot="header">
+            <span style="font-weight: bold">{{ columnDate[key] }}</span>
+            <span v-if="columnDateType[key] === '工作日'" style="border-color: #409EFF;color: #409EFF;border-style: solid;border-width: thin">{{ columnDateType[key] }}</span>
+            <span v-if="columnDateType[key] === '双休日'" style="border-color: #13ce66;color: #13ce66;border-style: solid;border-width: thin">{{ columnDateType[key] }}</span>
+          </template>
+          <template slot-scope="scope">
+            <div align="left">
+              <span v-if="scope.row[`${item}`] instanceof Array">
+                <span style="text-align: justify">{{ scope.row[`${item}`][0] }}</span>
+                <br>
+                <span>{{ scope.row[`${item}`][1] }}</span>
+                <span>&#8194;</span>
+                <span v-if="scope.row[`${item}`][2].includes('-')" style="color: lightgreen">{{ scope.row[`${item}`][2] }}</span>
+                <span v-else-if="scope.row[`${item}`][2] === '0.00%'" style="color: #1890ff">{{ scope.row[`${item}`][2] }}</span>
+                <span v-else style="color: red">{{ scope.row[`${item}`][2] }}</span>
+                <span>&#8194;</span>
+                <span v-if="scope.row[`${item}`][2].includes('-')">
+                  <svg-icon icon-class="箭头_向下" />
+                </span>
+                <span v-else-if="scope.row[`${item}`][2] === '0.00%'">
+                  <svg-icon icon-class="横线" />
+                </span>
+                <span v-else>
+                  <svg-icon icon-class="箭头_向上" />
+                </span>
+              </span>
+              <span v-else>
+                <span>{{ scope.row[`${item}`] }}</span>
+              </span>
+            </div>
+          </template>
+        </el-table-column>
       </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
-    </el-dialog>
-  </div>
+    </el-tab-pane>
+  </el-tabs>
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
-
 export default {
-  name: 'OrderTable',
-  components: { Pagination },
-  directives: { waves },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
-  },
+  name: 'Vuetest',
   data() {
     return {
-      tableKey: 0,
-      list: null,
-      total: 0,
-      listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: '+id'
-      },
-      importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
-      sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
-      ],
-      statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
-      dialogFormVisible: false,
-      dialogStatus: '',
-      textMap: {
-        update: 'Edit',
-        create: 'Create'
-      },
-      dialogPvVisible: false,
-      pvData: [],
-      rules: {
-        type: [
-          { required: true, message: 'type is required', trigger: 'change' }
-        ],
-        timestamp: [
-          {
-            type: 'date',
-            required: true,
-            message: 'timestamp is required',
-            trigger: 'change'
-          }
-        ],
-        title: [
-          { required: true, message: 'title is required', trigger: 'blur' }
-        ]
-      },
-      downloadLoading: false
+      time: '',
+      program: '',
+      topRank: '',
+      timeType: ['日', '周', '月'],
+      programType: ['全部', '电影', '电视剧', '综艺'],
+      TopSelect: ['Top10', 'Top100'],
+      columnDate: ['09-16', '09-15', '09-14', '09-13', '09-12', '09-11', '09-10'],
+      columnDateType: ['工作日', '工作日', '工作日', '工作日', '双休日', '双休日', '工作日'],
+      emptyData: [''],
+      tableData: [{
+        '09-16': '90.9%',
+        '09-15': '90.34%',
+        '09-14': '90.14%',
+        '09-13': '90.11%',
+        '09-12': '89.22%',
+        '09-11': '90.59%',
+        '09-10': '90.84%'
+      }, {
+        '09-16': ['开心锤锤', 19222, '-1.27%'],
+        '09-15': ['开心锤锤', 19469, '-6.51%'],
+        '09-14': ['开心锤锤', 20825, '-6.56%'],
+        '09-13': ['开心锤锤', 22288, '-39.88%'],
+        '09-12': ['开心锤锤', 37075, '-8.58%'],
+        '09-11': ['开心锤锤', 40555, '19.67%'],
+        '09-10': ['开心锤锤', 33888, '0.00%']
+      }, {
+        '09-16': ['一生一世', 6605, '27.86%'],
+        '09-15': ['宇宙护卫队之钢甲霸王龙', 6231, '-4.64%'],
+        '09-14': ['小猪佩奇第二季', 8137, '-27.25%'],
+        '09-13': ['小猪佩奇第二季', 11185, '-28.92%'],
+        '09-12': ['小猪佩奇第二季', 15736, '-3.54%'],
+        '09-11': ['白蛇2', 17782, '42.53%'],
+        '09-10': ['宇宙护卫队之钢甲霸王龙', 13046, '0.00%']
+      }, {
+        '09-16': ['代号山豹', 6140, '14.89%'],
+        '09-15': ['小猪佩奇第二季', 5576, '-31.47%'],
+        '09-14': ['宇宙护卫队之钢甲霸王龙', 6534, '-22.24%'],
+        '09-13': ['宇宙护卫队之钢甲霸王龙', 8403, '-44.49%'],
+        '09-12': ['宇宙护卫队之钢甲霸王龙', 15138, '-12.68%'],
+        '09-11': ['宇宙护卫队之钢甲霸王龙', 17337, '32.89%'],
+        '09-10': ['小猪佩奇第二季', 12992, '0.00%']
+      }, {
+        '09-16': ['宇宙护卫队之钢甲霸王龙', 5925, '-4.91%'],
+        '09-15': ['代号山豹', 5313, '29.59%'],
+        '09-14': ['白蛇2', 5163, '15.09%'],
+        '09-13': ['一生一世', 5331, '-34.05%'],
+        '09-12': ['白蛇2', 12104, '-31.93%'],
+        '09-11': ['小猪佩奇第二季', 16313, '25.56%'],
+        '09-10': ['白蛇2', 12476, '0.00%']
+      }, {
+        '09-16': ['小猪佩奇第二季', 5137, '-7.87%'],
+        '09-15': ['一生一世', 5166, '0.96%'],
+        '09-14': ['一生一世', 5117, '-4.01%'],
+        '09-13': ['叫我僵小鱼', 5239, '-35.43%'],
+        '09-12': ['新大头儿子小头爸爸', 8298, '-24.65%'],
+        '09-11': ['新大头儿子小头爸爸', 11012, '46.61%'],
+        '09-10': ['周生如故', 8182, '0.00%']
+      }
+      ]
     }
-  },
-  created() {
-    this.getList()
   },
   methods: {
-    getList() {
-      this.listLoading = true
-      fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items
-        this.total = response.data.total
 
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
-    },
-    handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
-    },
-    sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
-    },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            const index = this.list.findIndex((v) => v.id === this.temp.id)
-            this.list.splice(index, 1, this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
-      })
-      this.list.splice(index, 1)
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
-    },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then((excel) => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
-        })
-        this.downloadLoading = false
-      })
-    },
-    formatJson(filterVal) {
-      return this.list.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
-    },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}` ? 'ascending' : 'descending'
-    }
   }
 }
 </script>

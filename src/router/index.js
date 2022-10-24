@@ -6,6 +6,12 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 
+/* Router Modules */
+import consoleRouter from './modules/console'
+import orderRouter from './modules/order'
+import financialRouter from './modules/financial'
+import adminMangerRouter from './modules/admin-manger'
+
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -42,59 +48,18 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
-
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/index',
     children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' }
+      path: 'index',
+      name: 'Index',
+      component: () => import('@/views/index/index'),
+      meta: { title: '首页', icon: 'index', breadcrumb: false }
     }]
   },
-
-  {
-    path: '/order',
-    component: Layout,
-    redirect: '/order/table',
-    name: 'Order',
-    meta: { title: '订单', icon: 'el-icon-s-help' },
-    children: [
-      {
-        path: 'tb_order_table',
-        name: 'TbOrderTable',
-        component: () => import('@/views/order/tb_order_table'),
-        meta: { title: '淘宝订单', icon: 'table' }
-      },
-      {
-        path: 'jd_order_table',
-        name: 'JdOrderTable',
-        component: () => import('@/views/order/jd_order_table'),
-        meta: { title: '京东订单', icon: 'table' }
-      },
-      {
-        path: 'order_table',
-        name: 'OrderTable',
-        component: () => import('@/views/order/order_table'),
-        meta: { title: '订单', icon: 'table' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ]
-  }
+  orderRouter
 ]
 
 /**
@@ -103,73 +68,20 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
-    path: '/nested',
-    component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
-    meta: {
-      title: 'Nested',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
-      },
-      {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        meta: { title: 'menu2' }
-      }
-    ]
-  },
-
-  {
-    path: 'external-link',
+    path: '/wx_friend',
     component: Layout,
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: 'index',
+        name: 'Wx_Friend',
+        component: () => import('@/views/wx_friend/index'),
+        meta: { title: '好友列表', icon: 'wxFriend' }
       }
     ]
   },
+  consoleRouter,
+  financialRouter,
+  adminMangerRouter,
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }

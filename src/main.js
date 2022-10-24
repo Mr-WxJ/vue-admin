@@ -9,6 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 // import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 
 import '@/styles/index.scss' // global css
+import '@/styles/element-ui-reset.scss' // 自定义 css
 
 import App from './App'
 import store from './store'
@@ -51,3 +52,4 @@ new Vue({
   store,
   render: h => h(App)
 })
+

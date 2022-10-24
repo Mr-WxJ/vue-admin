@@ -1,20 +1,18 @@
 <template>
-  <el-table :data="tableData" style="width: 100%">
-    <el-table-column prop="date" label="日期" width="150">
+  <el-table :data="list" stripe style="width: 100%" highlight-current-row cell-class-name="container_lefts">
+    <el-table-column label="商品信息">
+      <!-- 分行显示 -->
+      <template slot-scope="scope">
+        <el-table :data="scope.row.goodsList" :show-header="false">
+          <el-table-column prop="name" />
+          <el-table-column prop="num" />
+        </el-table>
+      </template>
     </el-table-column>
-    <el-table-column label="配送信息">
-      <el-table-column prop="name" label="姓名" width="120">
-      </el-table-column>
-      <el-table-column label="地址">
-        <el-table-column prop="province" label="省份" width="120">
-        </el-table-column>
-        <el-table-column prop="city" label="市区" width="120">
-        </el-table-column>
-        <el-table-column prop="address" label="地址" width="300">
-        </el-table-column>
-        <el-table-column prop="zip" label="邮编" width="120">
-        </el-table-column>
-      </el-table-column>
+    <el-table-column prop="goodsCount" label="商品总数" width="140" />
+    <el-table-column fixed="right" align="center" width="230" label="操作">
+      <el-button type="primary" size="small">打包</el-button>
+      <el-button type="primary" size="small">打印</el-button>
     </el-table-column>
   </el-table>
 </template>
@@ -23,56 +21,42 @@
 export default {
   data() {
     return {
-      tableData: [{
-        date: '2016-05-03',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1518 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-02',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1518 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1518 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1518 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-08',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1518 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-06',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1518 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-07',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1518 弄',
-        zip: 200333
-      }]
+      list: [
+        {
+          goodsList: [
+            {
+              name: '青椒鸡蛋炒饭',
+              num: '3'
+            },
+            {
+              name: '鱼香肉丝盖浇饭',
+              num: '2'
+            },
+            {
+              name: '干锅土豆片盖浇饭',
+              num: '5'
+            }
+          ],
+          goodsCount: '10'
+        },
+        {
+          goodsList: [
+            {
+              name: '青椒鸡蛋炒饭',
+              num: '3'
+            },
+            {
+              name: '鱼香肉丝盖浇饭',
+              num: '2'
+            },
+            {
+              name: '干锅土豆片盖浇饭',
+              num: '5'
+            }
+          ],
+          goodsCount: '10'
+        }
+      ]
     }
   }
 }
