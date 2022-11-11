@@ -10,48 +10,81 @@ const consoleRouter = {
   meta: { title: '控制台', icon: 'console' },
   children: [
     {
-      path: 'robot_list',
-      name: 'RobotList',
-      component: () => import('@/views/console/robot_list'),
-      meta: { title: '机器人列表' }
+      path: 'robot',
+      name: 'Robot',
+      component: () => import('@/views/console/index'),
+      redirect: '/console/union',
+      children: [
+        {
+          path: 'list',
+          name: 'RobotList',
+          component: () => import('@/views/console/robot/list'),
+          meta: { title: '机器人列表' }
+        }
+      ]
     },
     {
       path: 'union',
       name: 'Union',
+      component: () => import('@/views/console/index'),
       meta: { title: '联盟配置' },
       redirect: '/console/union',
       children: [
         {
-          path: 'tb_union',
-          component: () => import('@/views/console/union/tb_union'),
-          name: 'TB_Union',
+          path: 'tb',
+          component: () => import('@/views/console/union/tb'),
+          name: 'TBUnion',
           meta: { title: '淘宝联盟' }
         },
         {
-          path: 'jd_union',
-          component: () => import('@/views/console/union/tb_union'),
-          name: 'JD_Union',
+          path: 'jd',
+          component: () => import('@/views/console/union/jd'),
+          name: 'JDUnion',
           meta: { title: '京东联盟' }
         }
       ]
     },
     {
-      path: 'reply_template',
-      name: 'ReplyTemplate',
-      component: () => import('@/views/console/reply_template'),
-      meta: { title: '回复配置' }
+      path: 'reply',
+      name: 'Reply',
+      component: () => import('@/views/console/index'),
+      redirect: '/console/union',
+      children: [
+        {
+          path: 'template',
+          name: 'ReplyTemplate',
+          component: () => import('@/views/console/reply/template'),
+          meta: { title: '回复配置' }
+        }
+      ]
     },
     {
-      path: 'rebate_percentage',
-      name: 'RebatePercentage',
-      component: () => import('@/views/console/rebate_percentage'),
-      meta: { title: '返利比例' }
+      path: 'rebate',
+      name: 'Rebate',
+      component: () => import('@/views/console/index'),
+      redirect: '/console/union',
+      children: [
+        {
+          path: 'rate',
+          name: 'RebatePercentage',
+          component: () => import('@/views/console/rebate/rate'),
+          meta: { title: '返利比例' }
+        }
+      ]
     },
     {
-      path: 'order_sync',
-      name: 'OrderSync',
-      component: () => import('@/views/console/order_sync'),
-      meta: { title: '订单同步设置' }
+      path: 'order',
+      name: 'Order',
+      component: () => import('@/views/console/index'),
+      redirect: '/console/union',
+      children: [
+        {
+          path: 'sync',
+          name: 'OrderSync',
+          component: () => import('@/views/console/order/sync'),
+          meta: { title: '订单同步设置' }
+        }
+      ]
     }
   ]
 }

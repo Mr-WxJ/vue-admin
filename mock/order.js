@@ -1,35 +1,40 @@
 const Mock = require('mockjs')
 
 const List = []
-const count = 100
-
-const baseContent = '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>'
-const image_uri = 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3'
+const count = 1
 
 for (let i = 0; i < count; i++) {
   List.push(Mock.mock({
-    id: '@increment',
-    timestamp: +Mock.Random.date('T'),
-    author: '@first',
-    reviewer: '@first',
-    title: '@title(5, 10)',
-    content_short: 'mock data',
-    content: baseContent,
-    forecast: '@float(0, 100, 2, 2)',
-    importance: '@integer(1, 3)',
-    'type|1': ['CN', 'US', 'JP', 'EU'],
-    'status|1': ['published', 'draft'],
-    display_time: '@datetime',
-    comment_disabled: true,
-    pageviews: '@integer(300, 5000)',
-    image_uri,
-    platforms: ['a-platform']
+    'goodsInfo': {
+      'item_image': '@image', // item_image,
+      'itemUrl': '@url',
+      'shopName': '@cword(5)',
+      'itemName': '@cword(15)',
+      'orderId|1-10': '@integer' // 订单号
+    },
+    'wxName': '@cname', // 微信名
+    'paidTime': '@date', // 下单时间
+    'finishTime': '@date', // 完成时间
+
+    'orderStatus|1': ['3', '12', '13', '14'], // 订单状态
+
+    'commissionRate': '5.0', // 佣金比例
+    'subSideRate': '90.0', // 分成比例
+    'platformRate': '90.0', // 平台比例
+    'finalRate': '90.0', // 最终分佣比例（单位：%）
+    'deductFee': '0.0', // 扣除的服务费
+
+    'estimateCosPrice': '54.0', // 预估计佣金额
+    'actualCosPrice': '0.0', // 实际计佣金额
+    'estimateFee': '2.43', // 预估佣金
+    'actualFee': '0.0' // 实际佣金
+
   }))
 }
 
 module.exports = [
   {
-    url: '/vue-admin/article/list',
+    url: '/vue-admin/order/list',
     type: 'get',
     response: config => {
       const { importance, type, title, page = 1, limit = 20, sort } = config.query
@@ -58,7 +63,7 @@ module.exports = [
   },
 
   {
-    url: '/vue-admin/article/detail',
+    url: '/vue-admin/order/detail',
     type: 'get',
     response: config => {
       const { id } = config.query
@@ -74,7 +79,7 @@ module.exports = [
   },
 
   {
-    url: '/vue-admin/article/pv',
+    url: '/vue-admin/order/pv',
     type: 'get',
     response: _ => {
       return {
@@ -92,7 +97,7 @@ module.exports = [
   },
 
   {
-    url: '/vue-admin/article/create',
+    url: '/vue-admin/order/create',
     type: 'post',
     response: _ => {
       return {
@@ -103,7 +108,7 @@ module.exports = [
   },
 
   {
-    url: '/vue-admin/article/update',
+    url: '/vue-admin/order/update',
     type: 'post',
     response: _ => {
       return {

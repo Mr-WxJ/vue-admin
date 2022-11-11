@@ -16,10 +16,18 @@ const financialRouter = {
       meta: { title: '钱包' }
     },
     {
-      path: 'cash-out',
-      name: 'TbOrderTable',
-      component: () => import('@/views/financial/cash_out'),
-      meta: { title: '提现记录' }
+      path: 'rebate',
+      name: 'Rebate',
+      component: () => import('@/views/financial/index'),
+      redirect: '/console/union',
+      children: [
+        {
+          path: 'record',
+          name: 'TbOrderTable',
+          component: () => import('@/views/financial/rebate/record'),
+          meta: { title: '提现记录' }
+        }
+      ]
     }
   ]
 }

@@ -1,8 +1,23 @@
 /* 鼠标滑过高亮显示 */
 .el-table tbody tr:hover > td {
-  background-color: rgb(189, 189, 189) !important;
+  background-color: #e7eef5 !important;
+}
+.el-table .success-row {
+  background: #f0f9eb !important;
 }
 
+// 修改表格头部背景
+.el-table th {
+  background: #fcfcfc !important;
+}
+// 修改表格内容字体颜色和字体大小
+.el-table {
+  color: #000000;
+  // font-size: 14px;
+}
+body {
+  background: #f8f8f8;
+}
 // /* 改变主题色变量 */
 // $--color-primary: teal;
 
@@ -19,6 +34,8 @@
   left: 50%;
   transform: translateX(-50%);
 }
+// $--background-color-base: #e7eef5 !important;
+// $--colo: #e7eef5 !important;
 
 $--color-primary: #425897 !default;
 $--color-success: #51c88a !default;
