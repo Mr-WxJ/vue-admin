@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function fetchTbUnionAccountList(query) {
+export function fetchTbUnionPidSimpleList(query) {
   return request({
     url: 'http://127.0.0.1:4523/m1/1810664-0-default/vue-admin/tb/union/pid/simple/list',
     // url: '/vue-admin/union/tb/list',
@@ -8,11 +8,12 @@ export function fetchTbUnionAccountList(query) {
     params: query
   })
 }
-export function fetchTbUnionAccount(id) {
+export function fetchJdUnionPidSimpleList(query) {
   return request({
-    url: '/vue-admin/union/tb/detail',
+    url: 'http://127.0.0.1:4523/m1/1810664-0-default/vue-admin/jd/union/pid/simple/list',
+    // url: '/vue-admin/union/tb/list',
     method: 'get',
-    params: { id }
+    params: query
   })
 }
 

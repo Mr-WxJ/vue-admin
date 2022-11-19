@@ -60,3 +60,4 @@ new Vue({
   render: h => h(App)
 })
 
+ElementUI.Tooltip.props.openDelay.default = 500

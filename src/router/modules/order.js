@@ -12,20 +12,14 @@ const orderRouter = {
     {
       path: 'tb',
       name: 'TbOrder',
-      component: () => import('@/views/order/tb'),
+      component: () => import('@/views/order/tb/index'),
       meta: { title: '淘宝订单', icon: 'tb_lm' }
     },
     {
       path: 'jd',
       name: 'JdOrder',
-      component: () => import('@/views/order/jd'),
+      component: () => import('@/views/order/jd/index'),
       meta: { title: '京东订单', icon: 'jd' }
-    },
-    {
-      path: 'table',
-      name: 'TbOrder',
-      component: () => import('@/views/order/table'),
-      meta: { title: '订单模板', icon: 'orders' }
     }
 
   ]

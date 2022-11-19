@@ -1,6 +1,6 @@
 <template>
 
-  <el-date-picker v-model="dateRange" :picker-options="pickerOptions" unlink-panels type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" :clearable="false" size="small" style="width: 280px" @change="dateRangeChange" />
+  <el-date-picker v-model="dateRange" :picker-options="pickerOptions" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" :clearable="false" size="small" style="width: 280px" @change="dateRangeChange" />
 
 </template>
 
@@ -12,6 +12,29 @@ export default {
       // 查询日期范围
       dateRange: null,
       pickerOptions: {
+        onPick: ({ maxDate, minDate }) => {
+          this.minDate = minDate
+          this.maxDate = maxDate
+          console.log(maxDate, minDate, '-')
+        },
+        disabledDate: (time) => {
+          // 查询时间跨度为30天
+          const curDate = new Date().getTime()
+          const three = 365 * 24 * 3600 * 1000
+          const threeMonths = curDate - three
+          if (time.getTime() > threeMonths && this.minDate && !this.maxDate) {
+            const range = 30 * 24 * 3600 * 1000
+            return (
+              time.getTime() > Date.now() ||
+              time.getTime() > this.minDate.getTime() + range ||
+              time.getTime() < this.minDate.getTime() - range
+            )
+          }
+          return (
+            time.getTime() > Date.now() - 24 * 3600 * 1000 || // 这里限制是前一天
+            time.getTime() < threeMonths // 这里是两年前的限制
+          )
+        },
         shortcuts: [
           {
             text: '今天',
@@ -76,15 +99,15 @@ export default {
               const end = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
               picker.$emit('pick', [start, end])
             }
-          },
-          {
-            text: '最近90天',
-            onClick(picker) {
-              const start = moment().subtract(90, 'days').format('YYYY-MM-DD HH:mm:ss')
-              const end = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
-              picker.$emit('pick', [start, end])
-            }
           }
+          // {
+          //   text: '最近90天',
+          //   onClick(picker) {
+          //     const start = moment().subtract(90, 'days').format('YYYY-MM-DD HH:mm:ss')
+          //     const end = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
+          //     picker.$emit('pick', [start, end])
+          //   }
+          // }
         ]
       }
     }

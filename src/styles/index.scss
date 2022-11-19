@@ -4,6 +4,7 @@
 @import "./element-ui.scss";
 @import "./sidebar.scss";
 @import "./btn.scss";
+@import "./order.scss";
 
 body {
   height: 100%;
@@ -124,7 +125,12 @@ aside {
 //main-container全局样式
 .app-container {
   padding: 15px 20px 20px 20px;
-  // 上填充是 15px,右填充是 5px,下填充是 15px,左填充是 20px
+  // 上填充,右填充,下填充,左填充
+}
+
+.app-container2 {
+  padding: 5px 10px 20px 10px;
+  // 上填充,右填充,下填充,左填充
 }
 
 .components-container {
