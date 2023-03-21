@@ -15,15 +15,16 @@ module.exports = {
   //it is base on https://github.com/vuejs/eslint-config-vue
   rules: {
     "vue/max-attributes-per-line": [
-      2,
+      1,
       {
-        singleline: 10,
+        singleline: 15,
         multiline: {
           max: 1,
           allowFirstLine: false,
         },
       },
     ],
+    'linebreak-style': [0, 'error', 'windows'],
     "vue/singleline-html-element-content-newline": "off",
     "vue/multiline-html-element-content-newline": "off",
     "vue/name-property-casing": ["error", "PascalCase"],
@@ -274,6 +275,6 @@ module.exports = {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
     "vue/multi-word-component-names": 0,
-    "space-before-function-paren": 0
+    "space-before-function-paren": 0,
   },
 };

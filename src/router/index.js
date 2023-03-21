@@ -10,7 +10,7 @@ import Layout from '@/layout'
 import consoleRouter from './modules/console'
 import orderRouter from './modules/order'
 import financialRouter from './modules/financial'
-import adminMangerRouter from './modules/admin-manger'
+import adminRouter from './modules/admin'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -73,15 +73,15 @@ export const asyncRoutes = [
     children: [
       {
         path: 'index',
-        name: 'Wx_Friend',
-        component: () => import('@/views/wx_friend/index'),
+        name: 'WxFriend',
+        component: () => import('@/views/friend/index'),
         meta: { title: '好友列表', icon: 'wxFriend' }
       }
     ]
   },
   consoleRouter,
   financialRouter,
-  adminMangerRouter,
+  adminRouter,
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
