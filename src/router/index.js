@@ -7,10 +7,6 @@ Vue.use(Router)
 import Layout from '@/layout'
 
 /* Router Modules */
-import consoleRouter from './modules/console'
-import orderRouter from './modules/order'
-import financialRouter from './modules/financial'
-import adminMangerRouter from './modules/admin-manger'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -58,8 +54,7 @@ export const constantRoutes = [
       component: () => import('@/views/index/index'),
       meta: { title: '首页', icon: 'index', breadcrumb: false }
     }]
-  },
-  orderRouter
+  }
 ]
 
 /**
@@ -67,22 +62,6 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-  {
-    path: '/wx_friend',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Wx_Friend',
-        component: () => import('@/views/wx_friend/index'),
-        meta: { title: '好友列表', icon: 'wxFriend' }
-      }
-    ]
-  },
-  consoleRouter,
-  financialRouter,
-  adminMangerRouter,
-
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
